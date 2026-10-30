@@ -106,6 +106,28 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .switch{display:inline-flex;gap:4px;padding:4px;background:var(--tint);border-radius:999px;margin-top:56px}
 .switches{display:flex;flex-wrap:wrap;gap:12px 16px;margin-top:56px}
 .switches .switch{margin-top:0}
+.fin .wrap{padding-block:140px}
+.fin__head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px 56px}
+.fin__head p{max-width:50ch;color:var(--soft)}
+.fin h2{font-size:clamp(28px,2.9vw,42px);letter-spacing:-.01em}
+#finTabs{margin-top:48px}
+.fin__top{display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:24px;margin-top:28px}
+.fin__top--one{grid-template-columns:1fr}
+.fin__fig{margin:0;display:flex;flex-direction:column;min-width:0}
+.fin__ph{position:relative;overflow:hidden;background:var(--tint);border-radius:4px}
+.fin__ph--hero{aspect-ratio:3/2}
+.fin__top--one .fin__ph--hero{aspect-ratio:16/8}
+.fin__fig--bath .fin__ph{flex:1;min-height:0}
+.fin__ph img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fin__fig figcaption{margin-top:10px;font-size:16px;color:var(--soft)}
+.fin__grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px;margin-top:40px}
+.fcard{background:var(--tint);border-radius:10px;overflow:hidden;display:flex;flex-direction:column}
+.fcard__img{position:relative;aspect-ratio:4/3;background:#fff}
+.fcard__img img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.fcard__img.is-contain img{object-fit:contain;padding:10px}
+.fcard__b{padding:16px 18px 20px}
+.fcard h3{font-size:19px;font-weight:500}
+.fcard p{margin-top:6px;font-size:16px;line-height:1.45;color:var(--soft)}
 .prints__floor{font-size:clamp(22px,2vw,28px);font-weight:500;letter-spacing:.01em;padding-top:12px;border-top:2px solid var(--ink)}
 .prints__floor:not(:first-child){margin-top:40px}
 .opop{position:absolute;z-index:3;pointer-events:none;width:max-content;max-width:min(250px,78%);background:#1B2325;color:#fff;padding:12px 14px;border-radius:8px;font-size:15px;line-height:1.35;box-shadow:0 12px 30px -10px rgba(14,22,24,.5)}
@@ -364,6 +386,15 @@ footer .wrap{padding-block:90px 36px}
   .studio .wrap,.social .wrap{padding-block:80px}
   .switch{margin-top:36px}
   .switches{margin-top:36px}
+  .fin .wrap{padding-block:88px}
+  #finTabs{margin-top:32px}
+  .fin__top{grid-template-columns:1fr}
+  .fin__fig--bath .fin__ph{flex:none;aspect-ratio:4/5}
+  .fin__top--one .fin__ph--hero{aspect-ratio:3/2}
+  .fin__grid{grid-template-columns:1fr 1fr;gap:12px}
+  .fcard__b{padding:12px 12px 16px}
+  .fcard h3{font-size:17px}
+  .fcard p{font-size:15px}
   .switches .switch{margin-top:0}
   /* pianta in verticale: ruotata di 90°, appartamento A in alto e B in basso, intera senza scorrere */
   .board{padding:0;container-type:inline-size;aspect-ratio:759/1282;overflow:hidden}
@@ -415,6 +446,7 @@ footer .wrap{padding-block:90px 36px}
     <nav aria-label="Sezioni">
       <a href="#planimetria">Planimetria</a>
       <a href="#ambienti">Ambienti</a>
+      <a href="#finiture">Finiture</a>
       <a href="#esterni">Esterni</a>
       <a href="#luogo">Il luogo</a>
       <a href="#contatti">Contatti</a>
@@ -491,6 +523,21 @@ footer .wrap{padding-block:90px 36px}
         <p class="rise">Toni caldi, legno, pietra chiara. Al piano terra il soggiorno sale a doppia altezza fino al soppalco. Al piano primo due bagni con caratteri diversi: il primo con gres effetto marmo bruno e rubinetteria nera, il secondo verde salvia con travertino e rubinetteria in ottone.</p>
       </div>
       <div class="prints" id="prints"></div>
+    </div>
+  </section>
+
+  <section class="fin" id="finiture" aria-labelledby="fin-title">
+    <div class="wrap">
+      <div class="fin__head">
+        <h2 id="fin-title" class="rise">Finiture, tre livelli</h2>
+        <p class="rise">Il capitolato prevede tre livelli di finitura: Standard, Medium e High. Per ognuno trovi pavimenti, rubinetteria, sanitari, piatto doccia e mobile del bagno, con i render del progetto e le immagini dei fornitori.</p>
+      </div>
+      <div class="tabs rise" role="tablist" aria-label="Livelli di finitura" id="finTabs">
+        <button type="button" role="tab" id="fl0" aria-selected="true" aria-controls="finPanel" data-i="0">Standard</button>
+        <button type="button" role="tab" id="fl1" aria-selected="false" aria-controls="finPanel" data-i="1">Medium</button>
+        <button type="button" role="tab" id="fl2" aria-selected="false" aria-controls="finPanel" data-i="2">High</button>
+      </div>
+      <div id="finPanel" role="tabpanel" aria-labelledby="fl0"></div>
     </div>
   </section>
 
@@ -718,6 +765,7 @@ footer .wrap{padding-block:90px 36px}
     carta:{src:'img/camera-carta.webp',view:'Variante: carta da parati',alt:'Render di una camera con carta da parati a motivo vegetale e armadio rosso mattone'},
     scala:{src:'img/soppalco-scala.webp',view:'Soggiorno con scala in legno',alt:'Render di un soggiorno a doppia altezza con scala in legno e soppalco'},
     vetrata:{src:'img/soppalco-vetrata.webp',view:'Soppalco sulla vetrata',alt:'Render di un soggiorno a doppia altezza con grande vetrata e soppalco studio'},
+    sogpar:{src:'img/fin-high-soggiorno.webp',view:'Soggiorno con parquet (finitura High)',alt:'Render del soggiorno a doppia altezza con scala in legno e pavimento in parquet'},
     carport:{src:'img/posto-auto.webp',view:'Posto auto coperto con struttura in legno',alt:'Render di un posto auto coperto con tettoia in legno, pavimentazione in autobloccanti e auto in ricarica'},
     bl:{src:'img/bagno-legno.webp',view:'Bagno con finestra a tutta altezza',alt:'Render di un bagno con pavimento in legno, doccia in vetro, finestra verticale e mobile in legno con lavabo in appoggio'},
     bc:{src:'img/bagno-cipria.webp',view:'Bagno color cipria',alt:'Render di un bagno con pareti color cipria, top in pietra, doccia con nicchia illuminata e sanitari sospesi'}
@@ -725,7 +773,7 @@ footer .wrap{padding-block:90px 36px}
   /* coordinate in % sulla pianta di ogni piano, appartamento A (sinistra); B è lo specchio */
   var FLOORS = {
     terra:{name:'Piano terra', img:'img/pianta-terra.webp', w:1436, h:850, alt:'Planimetria arredata del piano terra con due appartamenti speculari', rooms:[
-      {k:'t-soggiorno', name:'Soggiorno con soppalco', imgs:['vetrata','scala'], x:6.3,y:37.6,w:32,h:43.5},
+      {k:'t-soggiorno', name:'Soggiorno con soppalco', imgs:['vetrata','scala','sogpar'], x:6.3,y:37.6,w:32,h:43.5},
       {k:'t-padronale', name:'Camera padronale', imgs:['carta','terracotta'], x:6.3,y:9.4,w:15.7,h:25.9},
       {k:'t-camera', name:'Seconda camera', imgs:['terracotta','carta'], x:31.3,y:9.4,w:15.3,h:25.9},
       {k:'t-bagno1', name:'Bagno con finestra', imgs:['bl'], x:22.3,y:9.9,w:8.6,h:19.5},
@@ -852,10 +900,11 @@ footer .wrap{padding-block:90px 36px}
   var PRINTS = [
     ['Piano terra', [
       [['vetrata',1.108,'Soggiorno a doppia altezza','Vetrata e soppalco studio',['vetrata','scala']],
-       ['scala',1.494,'Scala in legno','Sale al soppalco',['scala','vetrata']]],
+       ['scala',1.5,'Scala in legno','Gres New Stone · finitura Standard',['scala','sogpar','vetrata']],
+       ['sogpar',1.5,'Soggiorno con parquet','Parquet Kährs · finitura High',['sogpar','scala','vetrata']]],
       [['carta',1.298,'Camera padronale','Carta da parati e armadio rosso mattone',['carta','terracotta']],
        ['terracotta',1.29,'Seconda camera','Parete terracotta e luce indiretta',['terracotta','carta']],
-       ['bl',.746,'Bagno con finestra','Pavimento in legno, rubinetteria bronzo',['bl','bc']],
+       ['bl',.667,'Bagno con finestra','Parquet, rubinetteria bronzo · finitura Medium',['bl','bc']],
        ['bc',.666,'Bagno cipria','Top in pietra, rubinetteria in ottone',['bc','bl']]]
     ]],
     ['Piano primo', [
@@ -863,7 +912,7 @@ footer .wrap{padding-block:90px 36px}
        ['cucina',1.333,'Cucina','Penisola e colonne in legno',['cucina','giorno']],
        ['padronale',1.333,'Camera padronale','Armadio a muro e scrittoio',['padronale','camera']]],
       [['camera',1.6,'Seconda camera','Portafinestra sul giardino',['camera','padronale']],
-       ['b1f',.667,'Bagno 1','Marmo bruno e rubinetteria nera',['b1f','b1a']],
+       ['b1f',.667,'Bagno 1','Gres effetto marmo bruno · finitura Standard',['b1f','b1a']],
        ['b2f',.667,'Bagno 2','Verde salvia, travertino, rubinetteria in ottone',['b2f','b2a']]],
       [['b1a',.667,'Bagno 1 dall\'alto','Doccia a filo pavimento',['b1a','b1f']],
        ['b2a',1.333,'Bagno 2 dall\'alto','Lavabo in appoggio e sanitari sospesi',['b2a','b2f']],
@@ -1087,6 +1136,52 @@ footer .wrap{padding-block:90px 36px}
     });
   });
   setOut(0);
+
+  /* ---------- Finiture dal capitolato: tre livelli ---------- */
+  var FIN = [
+    {name:'Standard', hero:{src:'img/fin-std-soggiorno.webp', cap:'Soggiorno con pavimento in gres New Stone 60×60'}, bath:{src:'img/bagno1-frontale.webp', cap:'Bagno in gres porcellanato'}, items:[
+      {t:'Pavimenti e rivestimenti', d:'Gres porcellanato New Stone, conforme UNI EN 14411 (gruppo BIa). Formato 60×60 a terra e 60×120 a parete. Colori Daino, Visone e Lepre.', img:'img/fin-colori.webp'},
+      {t:'Rubinetteria', d:'IB, modello Whynot.', img:'img/fin-std-rub.webp', fit:1},
+      {t:'Piatto doccia', d:'A basso spessore, in quarzo e pietra, tagliabile su misura.', img:'img/fin-std-piatto.webp'},
+      {t:'Sanitari', d:'Globo, posa a terra.', img:'img/fin-std-sanitari.webp'},
+      {t:'Mobile bagno', d:'Storm, modello Cover: top per lavabo d\'appoggio, fianchi e frontali in Dekorativo tinta unita Colortech Cenere. In alternativa, base sospesa a due cassetti con consolle Thin in ceramica bianco lucido e vasca integrata.', img:'img/fin-std-mobile.webp'}
+    ]},
+    {name:'Medium', hero:{src:'img/fin-med-soggiorno.webp', cap:'Soggiorno con pavimento in gres New Stone 120×120'}, bath:{src:'img/bagno-legno.webp', cap:'Bagno con parquet'}, items:[
+      {t:'Pavimenti e rivestimenti', d:'Gres porcellanato New Stone, conforme UNI EN 14411 (gruppo BIa). Formato 120×120 a terra e a parete. Colori Daino, Visone e Lepre.', img:'img/fin-colori.webp'},
+      {t:'Rubinetteria', d:'Paffoni, modello Light: miscelatore bidet LIG 131, miscelatore lavabo in appoggio LIG 018, gruppo doccia LIG 023 con supporto a muro snodato in metallo, doccetta e flessibile.', img:'img/fin-med-rub.webp', fit:1},
+      {t:'Piatto doccia', d:'In ardesia, Quare Design, colore beige.'},
+      {t:'Sanitari', d:'Ideal Standard, linea Life.', img:'img/fin-med-sanitari.webp'},
+      {t:'Mobile bagno', d:'Idea Group, modello Cubik.', img:'img/fin-med-mobile.webp'}
+    ]},
+    {name:'High', hero:{src:'img/fin-high-soggiorno.webp', cap:'Soggiorno con parquet Kährs'}, items:[
+      {t:'Pavimento', d:'Parquet Kährs Ale, Harmony Collection: spazzolato, vernice opaca, a tre strati, doghe 200 × 2423 × 15 mm.', img:'img/fin-high-parquet.webp'},
+      {t:'Rivestimento bagno', d:'Atlas Concorde Boost Stone, colore Crema, formati 60×120 e 30×60 grip.', img:'img/fin-high-rivestimento.webp'},
+      {t:'Rubinetteria', d:'Treemme, modello 3.6: miscelatore lavabo 246, miscelatore monocomando bidet, kit doccia con barra scorrevole.', img:'img/fin-high-rub.webp', fit:1},
+      {t:'Sanitari', d:'Alice, modello Form.', img:'img/fin-high-sanitari.webp'},
+      {t:'Mobile bagno', d:'Idea Group, modello Cubik.', img:'img/fin-high-mobile.webp'}
+    ]}
+  ];
+  var finTabs = [].slice.call(document.querySelectorAll('#finTabs [role=tab]'));
+  function setFin(i){
+    var L = FIN[i], h = '<div class="fin__top' + (L.bath ? '' : ' fin__top--one') + '">';
+    h += '<figure class="fin__fig"><div class="fin__ph fin__ph--hero"><img src="' + L.hero.src + '" alt="Render: ' + esc(L.hero.cap) + '" loading="lazy"></div><figcaption>' + esc(L.hero.cap) + ' · render</figcaption></figure>';
+    if (L.bath) h += '<figure class="fin__fig fin__fig--bath"><div class="fin__ph"><img src="' + L.bath.src + '" alt="Render: ' + esc(L.bath.cap) + '" loading="lazy"></div><figcaption>' + esc(L.bath.cap) + ' · render</figcaption></figure>';
+    h += '</div><div class="fin__grid">' + L.items.map(function(it){
+      return '<article class="fcard">' + (it.img ? '<div class="fcard__img' + (it.fit ? ' is-contain' : '') + '"><img src="' + it.img + '" alt="' + esc(it.t + ', finitura ' + L.name) + '" loading="lazy"></div>' : '') +
+        '<div class="fcard__b"><h3>' + esc(it.t) + '</h3><p>' + esc(it.d) + '</p></div></article>';
+    }).join('') + '</div>';
+    $('finPanel').innerHTML = h;
+    finTabs.forEach(function(t, j){ t.setAttribute('aria-selected', j === i); t.tabIndex = j === i ? 0 : -1; });
+    $('finPanel').setAttribute('aria-labelledby', finTabs[i].id);
+  }
+  finTabs.forEach(function(t, j){
+    t.addEventListener('click', function(){ setFin(j); });
+    t.addEventListener('keydown', function(e){
+      var n = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0;
+      if (n) { var k = (j + n + finTabs.length) % finTabs.length; finTabs[k].focus(); setFin(k); }
+    });
+  });
+  setFin(0);
 
   /* ---------- Copia numero ---------- */
   $('copyPhone').addEventListener('click', function(){
