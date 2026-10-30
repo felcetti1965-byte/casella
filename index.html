@@ -145,7 +145,8 @@ dialog::backdrop{background:var(--scrim)}
 .dlg__apt{color:var(--soft);font-size:16px}
 .dlg__view{font-size:19px;font-weight:500}
 .thumbs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
-.thumbs button{border:0;padding:0;background:none;cursor:pointer;text-align:left;font:400 14px var(--font);color:var(--soft)}
+.thumbs{align-items:start}
+.thumbs button{display:flex;flex-direction:column;justify-content:flex-start;align-self:start;border:0;padding:0;background:none;cursor:pointer;text-align:left;font:400 14px var(--font);color:var(--soft)}
 .thumbs img{aspect-ratio:4/3;width:100%;object-fit:cover;border-radius:4px;outline:3px solid transparent;outline-offset:-3px;transition:outline-color .2s}
 .thumbs button[aria-current="true"] img{outline-color:var(--slate)}
 .thumbs span{display:block;margin-top:4px}
@@ -164,7 +165,15 @@ dialog::backdrop{background:var(--scrim)}
 .print button{display:block;width:100%;border:0;padding:0;background:none;cursor:zoom-in}
 .print img{width:100%;height:100%;object-fit:cover;transition:transform .5s cubic-bezier(.2,.7,.2,1)}
 .print__frame{overflow:hidden;background:var(--ground)}
-.print button:hover img{transform:scale(1.03)}
+/* movimento 3D: la foto si inclina verso il mouse o il dito, l'immagine scorre dentro la cornice */
+.print button{perspective:1000px}
+.print__frame{position:relative;transform:rotateX(var(--rx,0deg)) rotateY(var(--ry,0deg)) scale(var(--s,1));transition:transform .5s cubic-bezier(.2,.7,.2,1),box-shadow .5s;box-shadow:0 0 0 rgba(14,22,24,0);will-change:transform}
+.print img{transform:scale(1.08) translate(var(--px,0px),var(--py,0px));transition:transform .5s cubic-bezier(.2,.7,.2,1)}
+.print__frame::after{content:"";position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .4s;background:radial-gradient(circle at var(--gx,50%) var(--gy,50%),rgba(255,255,255,.28),rgba(255,255,255,0) 55%)}
+.print.is-tilt .print__frame{--s:1.025;box-shadow:0 24px 48px -18px rgba(14,22,24,.45);transition:transform .12s linear,box-shadow .4s}
+.print.is-tilt img{transition:transform .12s linear}
+.print.is-tilt .print__frame::after{opacity:1}
+@media (prefers-reduced-motion:reduce){.print__frame{transform:none!important;box-shadow:none!important}.print img{transform:none!important}.print__frame::after{display:none}}
 .print figcaption{margin-top:12px;font-size:17px;font-weight:500}
 .print figcaption span{display:block;font-weight:400;font-size:16px;color:var(--soft)}
 
@@ -301,6 +310,7 @@ footer .wrap{padding-block:90px 36px}
 .tour__dir button{font:500 15px var(--font);border:0;background:var(--tint);color:var(--soft);padding:10px 14px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s}
 .tour__dir button[aria-pressed="true"]{background:var(--action);color:var(--action-ink)}
 .tour__bar .btn{min-height:46px}
+.lbl-m{display:none}
 @media (max-width:900px){.tour__bar{grid-template-columns:1fr}.tour__stage{height:56dvh}}
 
 /* logo: versione scura su fondo chiaro, versione chiara su fondo scuro */
@@ -346,11 +356,12 @@ footer .wrap{padding-block:90px 36px}
   .plan .wrap,.rooms .wrap,.out .wrap,.ask .wrap{padding-block:88px}
   .studio .wrap,.social .wrap{padding-block:80px}
   .switch{margin-top:36px}
-  .board{overflow:hidden;padding:0}
-  .board__in{width:180%;max-width:none;transition:transform .4s cubic-bezier(.2,.7,.2,1)}
-  .apt-a .board__in{transform:translateX(0)}
-  .apt-b .board__in{transform:translateX(-44.44%)}
-  .board__shade{background:rgba(251,250,247,.72)}
+  /* pianta in verticale: ruotata di 90°, appartamento A in alto e B in basso, intera senza scorrere */
+  .board{padding:0;container-type:inline-size;aspect-ratio:759/1282;overflow:hidden}
+  .board__in{position:absolute;top:0;left:100%;width:168.906cqw;max-width:none;transform:rotate(90deg);transform-origin:0 0}
+  .board__shade{background:rgba(243,241,236,.6)}
+  .pin{transform:translate(-50%,-50%) rotate(-90deg)}
+  .lbl-d{display:none}.lbl-m{display:inline}
   .hero__logo{width:180px}
   .pin{width:26px;height:26px}
   .pin::before,.pin::after{width:10px}
@@ -436,8 +447,8 @@ footer .wrap{padding-block:90px 36px}
         <p class="rise">La pianta del piano primo mostra i due appartamenti, uno lo specchio dell'altro. Ogni stanza apre i suoi render: per i bagni trovi la vista frontale e quella dall'alto, per le camere e la zona giorno le immagini degli arredi.</p>
       </div>
       <div class="switch rise" role="group" aria-label="Scegli l'appartamento">
-        <button type="button" id="aptA" aria-pressed="true" data-apt="A">Appartamento A · sinistra</button>
-        <button type="button" id="aptB" aria-pressed="false" data-apt="B">Appartamento B · destra</button>
+        <button type="button" id="aptA" aria-pressed="true" data-apt="A"><span class="lbl-d">Appartamento A · sinistra</span><span class="lbl-m">Appartamento A ↑</span></button>
+        <button type="button" id="aptB" aria-pressed="false" data-apt="B"><span class="lbl-d">Appartamento B · destra</span><span class="lbl-m">Appartamento B ↓</span></button>
       </div>
       <div class="plan__body">
         <div class="board rise apt-a" id="board">
@@ -681,14 +692,18 @@ footer .wrap{padding-block:90px 36px}
     b1f:{src:'img/bagno1-frontale.webp',view:'Vista frontale',alt:'Bagno 1, vista frontale: doccia in vetro, sanitari sospesi, mobile in legno'},
     b1a:{src:'img/bagno1-alto.webp',view:'Vista dall\'alto',alt:'Bagno 1, vista dall\'alto della disposizione'},
     b2f:{src:'img/bagno2-frontale.webp',view:'Vista frontale',alt:'Bagno 2, vista frontale: pareti verdi, travertino e ottone'},
-    b2a:{src:'img/bagno2-alto.webp',view:'Vista dall\'alto',alt:'Bagno 2, vista dall\'alto della disposizione'}
+    b2a:{src:'img/bagno2-alto.webp',view:'Vista dall\'alto',alt:'Bagno 2, vista dall\'alto della disposizione'},
+    terracotta:{src:'img/camera-terracotta.webp',view:'Variante: parete terracotta',alt:'Render di una camera con parete color terracotta, luce indiretta a soffitto e pouf'},
+    carta:{src:'img/camera-carta.webp',view:'Variante: carta da parati',alt:'Render di una camera con carta da parati a motivo vegetale e armadio rosso mattone'},
+    scala:{src:'img/soppalco-scala.webp',view:'Soggiorno con scala in legno',alt:'Render di un soggiorno a doppia altezza con scala in legno e soppalco'},
+    vetrata:{src:'img/soppalco-vetrata.webp',view:'Soppalco sulla vetrata',alt:'Render di un soggiorno a doppia altezza con grande vetrata e soppalco studio'}
   };
   /* coordinate in % sulla pianta, appartamento A (sinistra); B è lo specchio */
   var ROOMS = [
     {k:'soggiorno', name:'Soggiorno e pranzo', note:'3 render', imgs:['soggiorno','giorno','cucina'], x:31,y:12,w:17.5,h:44},
     {k:'cucina', name:'Cucina', note:'2 render', imgs:['cucina','giorno'], x:22.5,y:50,w:8.5,h:32},
-    {k:'padronale', name:'Camera padronale', note:'1 render', imgs:['padronale'], x:5,y:12,w:16.5,h:28},
-    {k:'camera', name:'Seconda camera', note:'1 render', imgs:['camera'], x:5,y:61,w:16.5,h:21},
+    {k:'padronale', name:'Camera padronale', note:'3 render', imgs:['padronale','terracotta','carta'], x:5,y:12,w:16.5,h:28},
+    {k:'camera', name:'Seconda camera', note:'3 render', imgs:['camera','terracotta','carta'], x:5,y:61,w:16.5,h:21},
     {k:'bagno1', name:'Bagno 1', note:'frontale e dall\'alto', imgs:['b1f','b1a'], x:22.5,y:12,w:7.5,h:27},
     {k:'bagno2', name:'Bagno 2', note:'frontale e dall\'alto', imgs:['b2f','b2a'], x:5,y:41,w:13,h:14}
   ];
@@ -729,6 +744,7 @@ footer .wrap{padding-block:90px 36px}
     board.className = 'board apt-' + a.toLowerCase();
     $('aptA').setAttribute('aria-pressed', a === 'A'); $('aptB').setAttribute('aria-pressed', a === 'B');
     $('legendTitle').textContent = 'Appartamento ' + a;
+    if (board.scrollWidth > board.clientWidth) board.scrollTo({left: a === 'A' ? 0 : board.scrollWidth, behavior: reduce ? 'auto' : 'smooth'});
     [].forEach.call(legend.querySelectorAll('.legend__note'), function(n){
       n.textContent = a === 'A' ? 'L\'appartamento B ha la stessa disposizione, specchiata.' : 'Disposizione specchiata dell\'appartamento A: stessi ambienti e stesse finiture.';
     });
@@ -784,11 +800,6 @@ footer .wrap{padding-block:90px 36px}
   });
 
   /* ---------- Ambienti: stampe ---------- */
-  /* foto del garage, anche nella galleria */
-  [['tretro','retro','Garage dal portone'],['tportone','portone','Garage verso l\'uscita'],['tcolonnina','colonnina','Colonnina di ricarica'],['tfianco','fianco','Garage di fianco'],['tsoffitto','soffitto','Soffitto del garage']].forEach(function(g){
-    IMG[g[0]] = {src:'img/tour-' + g[1] + '.webp', view:g[2], alt:'Render del garage in legno con ricarica per auto elettrica: ' + g[2].toLowerCase()};
-  });
-  var GT = ['tretro','tportone','tcolonnina','tfianco','tsoffitto'];
   /* righe della stessa altezza: ogni foto è larga in proporzione al suo formato */
   var PRINTS = [
     [['giorno',1.333,'Pranzo e ingresso','Zona giorno',['giorno','soggiorno','cucina']],
@@ -800,11 +811,10 @@ footer .wrap{padding-block:90px 36px}
     [['b1a',.667,'Bagno 1 dall\'alto','Doccia a filo pavimento',['b1a','b1f']],
      ['b2a',1.333,'Bagno 2 dall\'alto','Lavabo in appoggio e sanitari sospesi',['b2a','b2f']],
      ['soggiorno',1.6,'Soggiorno','Portafinestra sul verde',['soggiorno','giorno','cucina']]],
-    [['tretro',1.333,'Garage in legno','Auto in ricarica e capriata a vista',GT],
-     ['tportone',1.333,'Garage verso l\'uscita','Portone aperto sul giardino',GT],
-     ['tcolonnina',1.333,'Colonnina di ricarica','Wallbox a parete e luci LED',GT]],
-    [['tfianco',1.333,'Garage di fianco','Spazio libero attorno all\'auto',GT],
-     ['tsoffitto',1.333,'Soffitto del garage','Travi e perline in abete',GT]]
+    [['terracotta',1.29,'Camera, variante calda','Parete terracotta e luce indiretta',['terracotta','carta','padronale','camera']],
+     ['carta',1.298,'Camera, variante bosco','Carta da parati e armadio rosso mattone',['carta','terracotta','padronale','camera']]],
+    [['scala',1.494,'Soggiorno a doppia altezza','Scala in legno e soppalco',['scala','vetrata']],
+     ['vetrata',1.33,'Soppalco sulla vetrata','Angolo studio affacciato sul soggiorno',['vetrata','scala']]]
   ];
   var prints = $('prints');
   PRINTS.forEach(function(row){
@@ -818,7 +828,37 @@ footer .wrap{padding-block:90px 36px}
     f.innerHTML = '<button type="button" aria-label="Ingrandisci: ' + p[2] + '"><div class="print__frame"><img src="' + m.src + '" alt="' + m.alt + '" loading="lazy"></div></button><figcaption>' + p[2] + '<span>' + p[3] + '</span></figcaption>';
     var b = f.querySelector('button');
     b.addEventListener('click', function(){ openList(p[2], 'Render di progetto', p[4], b); });
+    tilt(f);
     rw.appendChild(f);
+  }
+
+  /* ---------- Movimento 3D delle foto ---------- */
+  function tilt(f){
+    if (reduce) return;
+    var fr = f.querySelector('.print__frame'), raf = null, last = null;
+    function apply(){
+      raf = null; if (!last) return;
+      var r = fr.getBoundingClientRect();
+      var x = Math.max(0, Math.min(1, (last.x - r.left) / r.width)), y = Math.max(0, Math.min(1, (last.y - r.top) / r.height));
+      fr.style.setProperty('--ry', ((x - .5) * 14).toFixed(2) + 'deg');
+      fr.style.setProperty('--rx', ((.5 - y) * 12).toFixed(2) + 'deg');
+      fr.style.setProperty('--px', ((.5 - x) * 3).toFixed(2) + '%');
+      fr.style.setProperty('--py', ((.5 - y) * 3).toFixed(2) + '%');
+      fr.style.setProperty('--gx', (x * 100).toFixed(1) + '%');
+      fr.style.setProperty('--gy', (y * 100).toFixed(1) + '%');
+    }
+    function move(x, y){ last = {x:x, y:y}; f.classList.add('is-tilt'); if (!raf) raf = requestAnimationFrame(apply); }
+    function reset(){
+      last = null; f.classList.remove('is-tilt');
+      ['--rx','--ry','--px','--py'].forEach(function(k){ fr.style.removeProperty(k); });
+    }
+    f.addEventListener('mousemove', function(e){ move(e.clientX, e.clientY); });
+    f.addEventListener('mouseleave', reset);
+    /* col dito: la foto segue il tocco senza bloccare lo scorrimento della pagina */
+    f.addEventListener('touchstart', function(e){ var t = e.touches[0]; move(t.clientX, t.clientY); }, {passive:true});
+    f.addEventListener('touchmove', function(e){ var t = e.touches[0]; move(t.clientX, t.clientY); }, {passive:true});
+    f.addEventListener('touchend', reset, {passive:true});
+    f.addEventListener('touchcancel', reset, {passive:true});
   }
 
   /* ---------- Esterni ---------- */
@@ -1064,6 +1104,7 @@ footer .wrap{padding-block:90px 36px}
   }
 })();
 </script>
+
 
 </body>
 </html>
