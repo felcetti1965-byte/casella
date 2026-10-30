@@ -104,6 +104,12 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .plan h2,.rooms h2,.out h2,.ask h2{font-size:clamp(28px,2.9vw,42px);letter-spacing:-.01em}
 .plan__head p{color:var(--soft);max-width:52ch}
 .switch{display:inline-flex;gap:4px;padding:4px;background:var(--tint);border-radius:999px;margin-top:56px}
+.switches{display:flex;flex-wrap:wrap;gap:12px 16px;margin-top:56px}
+.switches .switch{margin-top:0}
+.prints__floor{font-size:clamp(22px,2vw,28px);font-weight:500;letter-spacing:.01em;padding-top:12px;border-top:2px solid var(--ink)}
+.prints__floor:not(:first-child){margin-top:40px}
+.opop{position:absolute;z-index:3;pointer-events:none;width:max-content;max-width:min(250px,78%);background:#1B2325;color:#fff;padding:12px 14px;border-radius:8px;font-size:15px;line-height:1.35;box-shadow:0 12px 30px -10px rgba(14,22,24,.5)}
+.opop b{display:block;font-size:16px;font-weight:600;margin-bottom:2px}
 .switch button{font:500 16px var(--font);border:0;background:none;color:var(--soft);padding:11px 20px;border-radius:999px;cursor:pointer;transition:background .2s,color .2s}
 .switch button[aria-pressed="true"]{background:var(--action);color:var(--action-ink)}
 .plan__body{display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:36px;margin-top:24px;align-items:start}
@@ -191,6 +197,7 @@ dialog::backdrop{background:var(--scrim)}
 .out__garage .btn{min-height:48px;font-size:16px}
 .out__garage img{width:120px;aspect-ratio:4/3;object-fit:cover;border-radius:4px}
 .out__img img{width:100%;height:auto}
+.out__in{position:relative}
 .out__cap{margin-top:12px;font-size:16px;color:var(--soft)}
 
 /* il luogo */
@@ -356,10 +363,16 @@ footer .wrap{padding-block:90px 36px}
   .plan .wrap,.rooms .wrap,.out .wrap,.ask .wrap{padding-block:88px}
   .studio .wrap,.social .wrap{padding-block:80px}
   .switch{margin-top:36px}
+  .switches{margin-top:36px}
+  .switches .switch{margin-top:0}
   /* pianta in verticale: ruotata di 90°, appartamento A in alto e B in basso, intera senza scorrere */
   .board{padding:0;container-type:inline-size;aspect-ratio:759/1282;overflow:hidden}
   .board__in{position:absolute;top:0;left:100%;width:168.906cqw;max-width:none;transform:rotate(90deg);transform-origin:0 0}
   .board__shade{background:rgba(243,241,236,.6)}
+  /* planimetria degli esterni in verticale, come le piante dei piani */
+  .out__img{container-type:inline-size;aspect-ratio:var(--oh)/var(--ow)}
+  .out__in{position:absolute;top:0;left:100%;width:calc(100cqw * var(--ow) / var(--oh));transform:rotate(90deg);transform-origin:0 0}
+  .opop{left:50%!important;right:auto!important;top:auto!important;bottom:12px;transform:translateX(-50%)!important}
   .pin{transform:translate(-50%,-50%) rotate(-90deg)}
   .lbl-d{display:none}.lbl-m{display:inline}
   .hero__logo{width:180px}
@@ -417,7 +430,7 @@ footer .wrap{padding-block:90px 36px}
       <div class="hero__logo rise"><img class="on-light" src="img/arete-logo.png" alt="Aretè, progetto residenziale San Mariano" width="800" height="648"><img class="on-dark" src="img/arete-logo-chiaro.png" alt="Aretè, progetto residenziale San Mariano" width="800" height="648"></div>
       <div>
         <h1 id="hero-title" class="rise"><span>Progetto residenziale</span>San Mariano</h1>
-        <p class="hero__lead rise">Appartamenti speculari con due camere e due bagni a San Mariano di Corciano, alle porte di Perugia.</p>
+        <p class="hero__lead rise">Appartamenti speculari al piano terra e al piano primo, con due camere, due bagni e posto auto coperto di proprietà, a San Mariano di Corciano, alle porte di Perugia.</p>
         <div class="hero__acts rise">
           <a class="btn" href="#planimetria">Esplora la planimetria
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
@@ -436,7 +449,7 @@ footer .wrap{padding-block:90px 36px}
       <div class="rise"><strong>2 + 2</strong><span>camere da letto e bagni in ogni appartamento</span></div>
       <div class="rise"><strong>2</strong><span>appartamenti speculari per piano</span></div>
       <div class="rise"><strong>2</strong><span>terrazzi, sul fronte e sul retro</span></div>
-      <div class="rise"><strong>5</strong><span>garage in legno con ricarica per l'auto elettrica</span></div>
+      <div class="rise"><strong>5</strong><span>posti auto di proprietà</span></div>
     </div>
   </div>
 
@@ -444,21 +457,27 @@ footer .wrap{padding-block:90px 36px}
     <div class="wrap">
       <div class="plan__head">
         <h2 id="plan-title" class="rise">Tocca una stanza della pianta</h2>
-        <p class="rise">La pianta del piano primo mostra i due appartamenti, uno lo specchio dell'altro. Ogni stanza apre i suoi render: per i bagni trovi la vista frontale e quella dall'alto, per le camere e la zona giorno le immagini degli arredi.</p>
+        <p class="rise">Scegli il piano: ogni piano ha due appartamenti, uno lo specchio dell'altro. Ogni stanza apre i suoi render, con le immagini degli arredi e dei bagni.</p>
       </div>
-      <div class="switch rise" role="group" aria-label="Scegli l'appartamento">
+      <div class="switches rise">
+      <div class="switch" role="group" aria-label="Scegli il piano">
+        <button type="button" id="flT" aria-pressed="true" data-floor="terra">Piano terra</button>
+        <button type="button" id="flP" aria-pressed="false" data-floor="primo">Piano primo</button>
+      </div>
+      <div class="switch" role="group" aria-label="Scegli l'appartamento">
         <button type="button" id="aptA" aria-pressed="true" data-apt="A"><span class="lbl-d">Appartamento A · sinistra</span><span class="lbl-m">Appartamento A ↑</span></button>
         <button type="button" id="aptB" aria-pressed="false" data-apt="B"><span class="lbl-d">Appartamento B · destra</span><span class="lbl-m">Appartamento B ↓</span></button>
+      </div>
       </div>
       <div class="plan__body">
         <div class="board rise apt-a" id="board">
           <div class="board__in" id="boardIn">
-            <img src="img/pianta-piano.webp" alt="Planimetria arredata del piano primo con due appartamenti speculari" width="1282" height="759">
+            <img id="planImg" src="img/pianta-terra.webp" alt="Planimetria arredata del piano terra con due appartamenti speculari" width="1436" height="850">
             <div class="board__shade" aria-hidden="true"></div>
           </div>
         </div>
         <div class="legend rise" id="legend">
-          <h3 id="legendTitle">Appartamento A</h3>
+          <h3 id="legendTitle">Piano terra · Appartamento A</h3>
           <p class="legend__note">L'appartamento B ha la stessa disposizione, specchiata.</p>
         </div>
       </div>
@@ -469,7 +488,7 @@ footer .wrap{padding-block:90px 36px}
     <div class="wrap">
       <div class="rooms__head">
         <h2 id="rooms-title" class="rise">Gli ambienti, uno per uno</h2>
-        <p class="rise">Toni caldi, legno, pietra chiara. Due bagni con caratteri diversi: il primo con gres effetto marmo bruno e rubinetteria nera, il secondo verde salvia con travertino e finiture in ottone.</p>
+        <p class="rise">Toni caldi, legno, pietra chiara. Al piano terra il soggiorno sale a doppia altezza fino al soppalco. Al piano primo due bagni con caratteri diversi: il primo con gres effetto marmo bruno e rubinetteria nera, il secondo verde salvia con travertino e rubinetteria in ottone.</p>
       </div>
       <div class="prints" id="prints"></div>
     </div>
@@ -482,22 +501,24 @@ footer .wrap{padding-block:90px 36px}
         <p class="rise">L'edificio sta al centro di un lotto recintato e piantumato. Un vialetto pedonale gira tutto intorno alla casa; le auto entrano da un lato e escono dall'altro, senza manovre.</p>
         <ul class="rise">
           <li>Ingresso e uscita carrabili separati</li>
-          <li>Cinque garage in legno, con colonnina di ricarica per l'auto elettrica</li>
+          <li>5 posti auto di proprietà</li>
           <li>Giardini privati sul retro dell'edificio</li>
-          <li>Idromassaggio con solarium in legno nei giardini</li>
+          <li>Possibilità di piscina con solarium in legno nel giardino grande</li>
+          <li>Idromassaggio con pedana in legno nel giardino piccolo</li>
+          <li>Box vicino all'ingresso</li>
         </ul>
       </div>
       <div class="rise">
         <div class="tabs" role="tablist" aria-label="Planimetrie degli esterni" id="outTabs">
-          <button type="button" role="tab" id="t0" aria-selected="true" aria-controls="outPanel" data-i="0">Garage e idromassaggi</button>
+          <button type="button" role="tab" id="t0" aria-selected="true" aria-controls="outPanel" data-i="0">Posti auto, piscina e idromassaggio</button>
           <button type="button" role="tab" id="t1" aria-selected="false" aria-controls="outPanel" data-i="1">Il lotto</button>
-          <button type="button" role="tab" id="t2" aria-selected="false" aria-controls="outPanel" data-i="2">Idromassaggio nel giardino grande</button>
+          <button type="button" role="tab" id="t2" aria-selected="false" aria-controls="outPanel" data-i="2">Possibile piscina nel giardino grande</button>
           <button type="button" role="tab" id="t3" aria-selected="false" aria-controls="outPanel" data-i="3">Idromassaggio nel giardino piccolo</button>
         </div>
         <div id="outPanel" role="tabpanel" aria-labelledby="t0">
-          <figure class="out__img" id="outFig"><img id="outImg" src="img/esterni-garage.webp" alt="" width="1444" height="1089" loading="lazy"></figure>
+          <figure class="out__img" id="outBox" style="--ow:1444;--oh:1089"><div class="out__in" id="outFig"><img id="outImg" src="img/esterni-posti.webp" alt="" width="1444" height="1089" loading="lazy"></div><div class="opop" id="opop" hidden role="status"><b id="opopT"></b><span id="opopD"></span></div></figure>
           <p class="out__cap" id="outCap"></p>
-          <div class="out__garage" id="outGarage">
+          <div class="out__garage" id="outGarage" hidden>
             <img src="img/tour-retro.webp" alt="" width="1448" height="1086" loading="lazy">
             <button class="btn" type="button" id="openGarage">Fai il giro del garage a 360°</button>
           </div>
@@ -659,13 +680,13 @@ footer .wrap{padding-block:90px 36px}
       <img id="tourA" src="" alt="" draggable="false">
       <img id="tourB" class="tour__b" src="" alt="" draggable="false" aria-hidden="true">
       <span class="tour__badge">360°</span>
-      <p class="tour__hint" id="tourHint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M3 12h18"/></svg>Trascina per girarti nel garage</p>
+      <p class="tour__hint" id="tourHint"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 7l-5 5 5 5M16 7l5 5-5 5M3 12h18"/></svg>Trascina per girarti nel box</p>
       <button class="nav nav--p" type="button" id="tourPrev" aria-label="Girati a sinistra">‹</button>
       <button class="nav nav--n" type="button" id="tourNext" aria-label="Girati a destra">›</button>
       <button class="dlg__x" type="button" id="tourX" aria-label="Chiudi" style="display:grid;place-items:center">×</button>
     </div>
     <div class="tour__bar">
-      <div><h3 id="tourTitle">Garage in legno con ricarica</h3><p id="tourView"></p></div>
+      <div><h3 id="tourTitle">Il box, all'interno</h3><p id="tourView"></p></div>
       <div class="tour__dir" id="tourDir" role="group" aria-label="Scegli la vista"></div>
       <button class="btn btn--quiet" type="button" id="tourClose">Chiudi</button>
     </div>
@@ -696,43 +717,70 @@ footer .wrap{padding-block:90px 36px}
     terracotta:{src:'img/camera-terracotta.webp',view:'Variante: parete terracotta',alt:'Render di una camera con parete color terracotta, luce indiretta a soffitto e pouf'},
     carta:{src:'img/camera-carta.webp',view:'Variante: carta da parati',alt:'Render di una camera con carta da parati a motivo vegetale e armadio rosso mattone'},
     scala:{src:'img/soppalco-scala.webp',view:'Soggiorno con scala in legno',alt:'Render di un soggiorno a doppia altezza con scala in legno e soppalco'},
-    vetrata:{src:'img/soppalco-vetrata.webp',view:'Soppalco sulla vetrata',alt:'Render di un soggiorno a doppia altezza con grande vetrata e soppalco studio'}
+    vetrata:{src:'img/soppalco-vetrata.webp',view:'Soppalco sulla vetrata',alt:'Render di un soggiorno a doppia altezza con grande vetrata e soppalco studio'},
+    carport:{src:'img/posto-auto.webp',view:'Posto auto coperto con struttura in legno',alt:'Render di un posto auto coperto con tettoia in legno, pavimentazione in autobloccanti e auto in ricarica'},
+    bl:{src:'img/bagno-legno.webp',view:'Bagno con finestra a tutta altezza',alt:'Render di un bagno con pavimento in legno, doccia in vetro, finestra verticale e mobile in legno con lavabo in appoggio'},
+    bc:{src:'img/bagno-cipria.webp',view:'Bagno color cipria',alt:'Render di un bagno con pareti color cipria, top in pietra, doccia con nicchia illuminata e sanitari sospesi'}
   };
-  /* coordinate in % sulla pianta, appartamento A (sinistra); B è lo specchio */
-  var ROOMS = [
-    {k:'soggiorno', name:'Soggiorno e pranzo', note:'3 render', imgs:['soggiorno','giorno','cucina'], x:31,y:12,w:17.5,h:44},
-    {k:'cucina', name:'Cucina', note:'2 render', imgs:['cucina','giorno'], x:22.5,y:50,w:8.5,h:32},
-    {k:'padronale', name:'Camera padronale', note:'3 render', imgs:['padronale','terracotta','carta'], x:5,y:12,w:16.5,h:28},
-    {k:'camera', name:'Seconda camera', note:'3 render', imgs:['camera','terracotta','carta'], x:5,y:61,w:16.5,h:21},
-    {k:'bagno1', name:'Bagno 1', note:'frontale e dall\'alto', imgs:['b1f','b1a'], x:22.5,y:12,w:7.5,h:27},
-    {k:'bagno2', name:'Bagno 2', note:'frontale e dall\'alto', imgs:['b2f','b2a'], x:5,y:41,w:13,h:14}
-  ];
+  /* coordinate in % sulla pianta di ogni piano, appartamento A (sinistra); B è lo specchio */
+  var FLOORS = {
+    terra:{name:'Piano terra', img:'img/pianta-terra.webp', w:1436, h:850, alt:'Planimetria arredata del piano terra con due appartamenti speculari', rooms:[
+      {k:'t-soggiorno', name:'Soggiorno con soppalco', imgs:['vetrata','scala'], x:6.3,y:37.6,w:32,h:43.5},
+      {k:'t-padronale', name:'Camera padronale', imgs:['carta','terracotta'], x:6.3,y:9.4,w:15.7,h:25.9},
+      {k:'t-camera', name:'Seconda camera', imgs:['terracotta','carta'], x:31.3,y:9.4,w:15.3,h:25.9},
+      {k:'t-bagno1', name:'Bagno con finestra', imgs:['bl'], x:22.3,y:9.9,w:8.6,h:19.5},
+      {k:'t-bagno2', name:'Bagno cipria', imgs:['bc'], x:41.8,y:37.6,w:8.1,h:20}
+    ]},
+    primo:{name:'Piano primo', img:'img/pianta-piano.webp', w:1282, h:759, alt:'Planimetria arredata del piano primo con due appartamenti speculari', rooms:[
+      {k:'soggiorno', name:'Soggiorno e pranzo', imgs:['soggiorno','giorno','cucina'], x:31,y:12,w:17.5,h:44},
+      {k:'cucina', name:'Cucina', imgs:['cucina','giorno'], x:22.5,y:50,w:8.5,h:32},
+      {k:'padronale', name:'Camera padronale', imgs:['padronale','camera'], x:5,y:12,w:16.5,h:28},
+      {k:'camera', name:'Seconda camera', imgs:['camera','padronale'], x:5,y:61,w:16.5,h:21},
+      {k:'bagno1', name:'Bagno 1', imgs:['b1f','b1a'], x:22.5,y:12,w:7.5,h:27},
+      {k:'bagno2', name:'Bagno 2', imgs:['b2f','b2a'], x:5,y:41,w:13,h:14}
+    ]}
+  };
+  var floor = 'terra', ROOMS = FLOORS.terra.rooms;
+  function note(r){ var n = r.imgs.length; return n === 1 ? '1 render' : n + ' render'; }
 
   /* ---------- Pianta interattiva ---------- */
   var board = $('board'), boardIn = $('boardIn'), legend = $('legend'), apt = 'A';
-  ROOMS.forEach(function(r){
-    ['A','B'].forEach(function(a){
-      var x = a === 'A' ? r.x : 100 - r.x - r.w;
-      var b = document.createElement('button');
-      b.type = 'button'; b.className = 'spot'; b.dataset.apt = a; b.dataset.k = r.k;
-      b.style.left = x + '%'; b.style.top = r.y + '%'; b.style.width = r.w + '%'; b.style.height = r.h + '%';
-      b.setAttribute('aria-label', r.name + ', appartamento ' + a + ': apri i render');
-      b.innerHTML = '<span class="pin" aria-hidden="true"><i></i></span><span class="tip">' + r.name + '</span>';
-      b.addEventListener('click', function(){ openRoom(r.k, a, b); });
-      b.addEventListener('mouseenter', function(){ mark(r.k, true); });
-      b.addEventListener('mouseleave', function(){ mark(r.k, false); });
-      boardIn.appendChild(b);
+  function buildPlan(){
+    [].forEach.call(boardIn.querySelectorAll('.spot'), function(s){ s.remove(); });
+    [].forEach.call(legend.querySelectorAll('button'), function(s){ s.remove(); });
+    ROOMS.forEach(function(r){
+      ['A','B'].forEach(function(a){
+        var x = a === 'A' ? r.x : 100 - r.x - r.w;
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = 'spot'; b.dataset.apt = a; b.dataset.k = r.k;
+        b.style.left = x + '%'; b.style.top = r.y + '%'; b.style.width = r.w + '%'; b.style.height = r.h + '%';
+        b.setAttribute('aria-label', r.name + ', ' + FLOORS[floor].name.toLowerCase() + ', appartamento ' + a + ': apri i render');
+        b.innerHTML = '<span class="pin" aria-hidden="true"><i></i></span><span class="tip">' + r.name + '</span>';
+        b.addEventListener('click', function(){ openRoom(r.k, a, b); });
+        b.addEventListener('mouseenter', function(){ mark(r.k, true); });
+        b.addEventListener('mouseleave', function(){ mark(r.k, false); });
+        boardIn.appendChild(b);
+      });
+      var l = document.createElement('button');
+      l.type = 'button'; l.dataset.k = r.k;
+      l.innerHTML = '<span>' + r.name + '</span><small>' + note(r) + '</small>';
+      l.addEventListener('click', function(){ openRoom(r.k, apt, l); });
+      l.addEventListener('mouseenter', function(){ mark(r.k, true); });
+      l.addEventListener('mouseleave', function(){ mark(r.k, false); });
+      l.addEventListener('focus', function(){ mark(r.k, true); });
+      l.addEventListener('blur', function(){ mark(r.k, false); });
+      legend.insertBefore(l, legend.querySelector('.legend__note'));
     });
-    var l = document.createElement('button');
-    l.type = 'button'; l.dataset.k = r.k;
-    l.innerHTML = '<span>' + r.name + '</span><small>' + r.note + '</small>';
-    l.addEventListener('click', function(){ openRoom(r.k, apt, l); });
-    l.addEventListener('mouseenter', function(){ mark(r.k, true); });
-    l.addEventListener('mouseleave', function(){ mark(r.k, false); });
-    l.addEventListener('focus', function(){ mark(r.k, true); });
-    l.addEventListener('blur', function(){ mark(r.k, false); });
-    legend.insertBefore(l, legend.querySelector('.legend__note'));
-  });
+  }
+  function setFloor(f){
+    floor = f; ROOMS = FLOORS[f].rooms;
+    var im = $('planImg'); im.src = FLOORS[f].img; im.alt = FLOORS[f].alt; im.width = FLOORS[f].w; im.height = FLOORS[f].h;
+    $('flT').setAttribute('aria-pressed', f === 'terra'); $('flP').setAttribute('aria-pressed', f === 'primo');
+    buildPlan(); setApt(apt);
+  }
+  $('flT').addEventListener('click', function(){ setFloor('terra'); });
+  $('flP').addEventListener('click', function(){ setFloor('primo'); });
+  buildPlan();
   function mark(k, on){
     [].forEach.call(document.querySelectorAll('[data-k="' + k + '"]'), function(el){
       if (el.classList.contains('spot') && el.dataset.apt !== apt) return;
@@ -743,7 +791,7 @@ footer .wrap{padding-block:90px 36px}
     apt = a;
     board.className = 'board apt-' + a.toLowerCase();
     $('aptA').setAttribute('aria-pressed', a === 'A'); $('aptB').setAttribute('aria-pressed', a === 'B');
-    $('legendTitle').textContent = 'Appartamento ' + a;
+    $('legendTitle').textContent = FLOORS[floor].name + ' · Appartamento ' + a;
     if (board.scrollWidth > board.clientWidth) board.scrollTo({left: a === 'A' ? 0 : board.scrollWidth, behavior: reduce ? 'auto' : 'smooth'});
     [].forEach.call(legend.querySelectorAll('.legend__note'), function(n){
       n.textContent = a === 'A' ? 'L\'appartamento B ha la stessa disposizione, specchiata.' : 'Disposizione specchiata dell\'appartamento A: stessi ambienti e stesse finiture.';
@@ -779,7 +827,7 @@ footer .wrap{padding-block:90px 36px}
   }
   function openRoom(k, a, from){
     var r = ROOMS.filter(function(x){ return x.k === k; })[0];
-    openList(r.name, 'Appartamento ' + a + (a === 'B' ? ' · disposizione specchiata' : ''), r.imgs, from);
+    openList(r.name, FLOORS[floor].name + ' · Appartamento ' + a + (a === 'B' ? ' · disposizione specchiata' : ''), r.imgs, from);
   }
   function closeDlg(){ if (dlg.open) dlg.close(); }
   dlg.addEventListener('close', function(){ if (opener) try { opener.focus(); } catch(e){} });
@@ -802,32 +850,41 @@ footer .wrap{padding-block:90px 36px}
   /* ---------- Ambienti: stampe ---------- */
   /* righe della stessa altezza: ogni foto è larga in proporzione al suo formato */
   var PRINTS = [
-    [['giorno',1.333,'Pranzo e ingresso','Zona giorno',['giorno','soggiorno','cucina']],
-     ['cucina',1.333,'Cucina','Penisola e colonne in legno',['cucina','giorno']],
-     ['padronale',1.333,'Camera padronale','Armadio a muro e scrittoio',['padronale','camera']]],
-    [['camera',1.6,'Seconda camera','Portafinestra sul giardino',['camera','padronale']],
-     ['b1f',.667,'Bagno 1','Marmo bruno e rubinetteria nera',['b1f','b1a']],
-     ['b2f',.667,'Bagno 2','Verde salvia, travertino, ottone',['b2f','b2a']]],
-    [['b1a',.667,'Bagno 1 dall\'alto','Doccia a filo pavimento',['b1a','b1f']],
-     ['b2a',1.333,'Bagno 2 dall\'alto','Lavabo in appoggio e sanitari sospesi',['b2a','b2f']],
-     ['soggiorno',1.6,'Soggiorno','Portafinestra sul verde',['soggiorno','giorno','cucina']]],
-    [['terracotta',1.29,'Camera, variante calda','Parete terracotta e luce indiretta',['terracotta','carta','padronale','camera']],
-     ['carta',1.298,'Camera, variante bosco','Carta da parati e armadio rosso mattone',['carta','terracotta','padronale','camera']]],
-    [['scala',1.494,'Soggiorno a doppia altezza','Scala in legno e soppalco',['scala','vetrata']],
-     ['vetrata',1.33,'Soppalco sulla vetrata','Angolo studio affacciato sul soggiorno',['vetrata','scala']]]
+    ['Piano terra', [
+      [['vetrata',1.108,'Soggiorno a doppia altezza','Vetrata e soppalco studio',['vetrata','scala']],
+       ['scala',1.494,'Scala in legno','Sale al soppalco',['scala','vetrata']]],
+      [['carta',1.298,'Camera padronale','Carta da parati e armadio rosso mattone',['carta','terracotta']],
+       ['terracotta',1.29,'Seconda camera','Parete terracotta e luce indiretta',['terracotta','carta']],
+       ['bl',.746,'Bagno con finestra','Pavimento in legno, rubinetteria bronzo',['bl','bc']],
+       ['bc',.666,'Bagno cipria','Top in pietra, rubinetteria in ottone',['bc','bl']]]
+    ]],
+    ['Piano primo', [
+      [['giorno',1.333,'Pranzo e ingresso','Zona giorno',['giorno','soggiorno','cucina']],
+       ['cucina',1.333,'Cucina','Penisola e colonne in legno',['cucina','giorno']],
+       ['padronale',1.333,'Camera padronale','Armadio a muro e scrittoio',['padronale','camera']]],
+      [['camera',1.6,'Seconda camera','Portafinestra sul giardino',['camera','padronale']],
+       ['b1f',.667,'Bagno 1','Marmo bruno e rubinetteria nera',['b1f','b1a']],
+       ['b2f',.667,'Bagno 2','Verde salvia, travertino, rubinetteria in ottone',['b2f','b2a']]],
+      [['b1a',.667,'Bagno 1 dall\'alto','Doccia a filo pavimento',['b1a','b1f']],
+       ['b2a',1.333,'Bagno 2 dall\'alto','Lavabo in appoggio e sanitari sospesi',['b2a','b2f']],
+       ['soggiorno',1.6,'Soggiorno','Portafinestra sul verde',['soggiorno','giorno','cucina']]]
+    ]]
   ];
   var prints = $('prints');
-  PRINTS.forEach(function(row){
-    var rw = document.createElement('div'); rw.className = 'prow'; prints.appendChild(rw);
-    row.forEach(function(p){ addPrint(p, rw); });
+  PRINTS.forEach(function(g){
+    var h = document.createElement('h3'); h.className = 'prints__floor rise'; h.textContent = g[0]; prints.appendChild(h);
+    g[1].forEach(function(row){
+      var rw = document.createElement('div'); rw.className = 'prow'; prints.appendChild(rw);
+      row.forEach(function(p){ addPrint(p, rw, g[0]); });
+    });
   });
-  function addPrint(p, rw){
+  function addPrint(p, rw, fl){
     var m = IMG[p[0]], f = document.createElement('figure');
     f.className = 'print rise' + (p[1] < 1 ? ' print--tall' : '');
     f.style.setProperty('--r', p[1]);
     f.innerHTML = '<button type="button" aria-label="Ingrandisci: ' + p[2] + '"><div class="print__frame"><img src="' + m.src + '" alt="' + m.alt + '" loading="lazy"></div></button><figcaption>' + p[2] + '<span>' + p[3] + '</span></figcaption>';
     var b = f.querySelector('button');
-    b.addEventListener('click', function(){ openList(p[2], 'Render di progetto', p[4], b); });
+    b.addEventListener('click', function(){ openList(p[2], (fl ? fl + ' · ' : '') + 'Render di progetto', p[4], b); });
     tilt(f);
     rw.appendChild(f);
   }
@@ -968,29 +1025,57 @@ footer .wrap{padding-block:90px 36px}
     range = fit(tA); place(tA, 0); label();
     if (tA.complete) auto(); else tA.onload = function(){ tA.onload = null; range = fit(tA); auto(); };
   }
-  var GARAGES = [[13,29,11,15],[4,60,11,9.5],[4,69.5,11,9.5],[82,60,12,9.5],[82,70,12,9]];
+  /* esterni: i + aprono una scheda breve (posti auto, piscina, idromassaggio, box) */
+  var OSPOTS = [
+    {g:[13,29,11,15], t:'Box vicino all\'ingresso', d:'Box in legno vicino all\'ingresso pedonale.'},
+    {g:[3.8,60.3,11,8.6], t:'Box', d:'Box chiuso in legno vicino all\'ingresso: guarda l\'interno.', go:'tour'},
+    {g:[22.5,18.8,7,9], t:'Idromassaggio', d:'Nel giardino piccolo (42 mq), con pedana in legno e due lettini.'},
+    {g:[83,33,9.5,18], t:'Possibile piscina', d:'Possibilità di piscina nel giardino grande (110 mq), con solarium in legno e due lettini.'},
+    {g:[3.8,69.5,11,8.6], t:'Posto auto di proprietà', d:'Coperto, con tettoia in legno.', go:'photo'},
+    {g:[82.2,60.3,11.8,8.6], t:'Posto auto di proprietà', d:'Coperto, con tettoia in legno.', go:'photo'},
+    {g:[82.2,69.7,11.8,8.8], t:'Posto auto di proprietà', d:'Coperto, con tettoia in legno.', go:'photo'}
+  ];
   $('openGarage').addEventListener('click', function(){ openTour($('openGarage')); });
-  var gspots = GARAGES.map(function(g, i){
-    var b = document.createElement('button');
+  var opop = $('opop'), opOn = null;
+  function hideInfo(){ opop.hidden = true; if (opOn) opOn.classList.remove('is-on'); opOn = null; }
+  function showInfo(b, s){
+    if (opOn === b) { hideInfo(); return; }
+    hideInfo(); opOn = b; b.classList.add('is-on');
+    $('opopT').textContent = s.t; $('opopD').textContent = s.d;
+    var cx = s.g[0] + s.g[2] / 2, tx = '-50%';
+    opop.style.right = 'auto';
+    if (cx > 60) { opop.style.left = 'auto'; opop.style.right = Math.max(2, 100 - s.g[0] - s.g[2]) + '%'; tx = '0'; }
+    else if (cx < 40) { opop.style.left = Math.max(2, s.g[0]) + '%'; tx = '0'; }
+    else { opop.style.left = cx + '%'; }
+    opop.hidden = false;
+    var fh = $('outFig').clientHeight, room = fh * s.g[1] / 100;
+    if (room < opop.offsetHeight + 14) { opop.style.top = (s.g[1] + s.g[3]) + '%'; opop.style.transform = 'translate(' + tx + ',10px)'; }
+    else { opop.style.top = s.g[1] + '%'; opop.style.transform = 'translate(' + tx + ',calc(-100% - 10px))'; }
+  }
+  document.addEventListener('click', function(e){ if (opOn && !e.target.closest('.gspot')) hideInfo(); });
+  document.addEventListener('keydown', function(e){ if (e.key === 'Escape') hideInfo(); });
+  var gspots = OSPOTS.map(function(s){
+    var g = s.g, b = document.createElement('button');
     b.type = 'button'; b.className = 'spot gspot';
     b.style.left = g[0] + '%'; b.style.top = g[1] + '%'; b.style.width = g[2] + '%'; b.style.height = g[3] + '%';
-    b.setAttribute('aria-label', 'Garage ' + (i + 1) + ': fai il giro dell\'interno');
-    b.innerHTML = '<span class="pin" aria-hidden="true"><i></i></span><span class="tip">Interno del garage</span>';
-    b.addEventListener('click', function(){ openTour(b); });
+    b.setAttribute('aria-label', s.t + ': ' + s.d);
+    b.innerHTML = '<span class="pin" aria-hidden="true"><i></i></span><span class="tip">' + s.t + '</span>';
+    b.addEventListener('click', function(){ hideInfo(); if (s.go === 'tour') openTour(b); else if (s.go === 'photo') openList('Posto auto di proprietà', 'Coperto, con tettoia in legno', ['carport'], b); else showInfo(b, s); });
     $('outFig').appendChild(b); return b;
   });
   var OUT = [
-    {src:'img/esterni-garage.webp', w:1444, h:1089, garage:true, cap:'Cinque garage in legno e due idromassaggi, uno per giardino. Tocca un garage per fare il giro dell\'interno, con la colonnina di ricarica.', alt:'Planimetria del lotto con cinque garage in legno e due vasche idromassaggio'},
-    {src:'img/esterni-1.webp', w:849, h:640, cap:'Planimetria del lotto: edificio al centro, vialetto perimetrale, giardini sul retro e cinque posti auto.', alt:'Planimetria del lotto con giardini, posti auto, ingresso e uscita'},
-    {src:'img/esterni-2.webp', w:1445, h:1089, cap:'Proposta: vasca idromassaggio con pedana in legno e due lettini nel giardino grande.', alt:'Planimetria del lotto con idromassaggio nel giardino grande, a destra'},
+    {src:'img/esterni-posti.webp', w:1444, h:1089, garage:true, cap:'Posti auto di proprietà, il box vicino all\'ingresso, l\'idromassaggio nel giardino piccolo e la possibilità di piscina nel giardino grande. Tocca i + per i dettagli: il box mostra l\'interno, i posti auto la tettoia.', alt:'Planimetria del lotto con posti auto coperti, box, idromassaggio e possibile piscina'},
+    {src:'img/esterni-1.webp', w:849, h:640, cap:'Planimetria del lotto: edificio al centro, vialetto perimetrale, giardini sul retro e posti auto.', alt:'Planimetria del lotto con giardini, posti auto, ingresso e uscita'},
+    {src:'img/esterni-2.webp', w:1445, h:1089, cap:'Possibilità di piscina con pedana in legno e due lettini nel giardino grande.', alt:'Planimetria del lotto con la piscina nel giardino grande, a destra'},
     {src:'img/esterni-3.webp', w:1445, h:1089, cap:'Proposta: vasca idromassaggio nel giardino piccolo, accanto al posto auto d\'ingresso.', alt:'Planimetria del lotto con idromassaggio nel giardino piccolo, a sinistra'}
   ];
   var tabs = [].slice.call(document.querySelectorAll('#outTabs [role=tab]'));
   function setOut(i){
     var o = OUT[i];
     $('outImg').src = o.src; $('outImg').alt = o.alt; $('outImg').width = o.w; $('outImg').height = o.h;
+    $('outBox').style.setProperty('--ow', o.w); $('outBox').style.setProperty('--oh', o.h);
     $('outCap').textContent = o.cap;
-    gspots.forEach(function(b){ b.hidden = !o.garage; });
+    gspots.forEach(function(b){ b.hidden = !o.garage; }); hideInfo();
     tabs.forEach(function(t, j){ t.setAttribute('aria-selected', j === i); t.tabIndex = j === i ? 0 : -1; });
     $('outPanel').setAttribute('aria-labelledby', tabs[i].id);
   }
