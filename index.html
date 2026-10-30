@@ -346,9 +346,11 @@ footer .wrap{padding-block:90px 36px}
   .plan .wrap,.rooms .wrap,.out .wrap,.ask .wrap{padding-block:88px}
   .studio .wrap,.social .wrap{padding-block:80px}
   .switch{margin-top:36px}
-  .board{overflow-x:auto;padding:0}
-  .board__in{width:720px;max-width:none;padding:8px}
-  .board__shade{display:none}
+  .board{overflow:hidden;padding:0}
+  .board__in{width:180%;max-width:none;transition:transform .4s cubic-bezier(.2,.7,.2,1)}
+  .apt-a .board__in{transform:translateX(0)}
+  .apt-b .board__in{transform:translateX(-44.44%)}
+  .board__shade{background:rgba(251,250,247,.72)}
   .hero__logo{width:180px}
   .pin{width:26px;height:26px}
   .pin::before,.pin::after{width:10px}
@@ -727,7 +729,6 @@ footer .wrap{padding-block:90px 36px}
     board.className = 'board apt-' + a.toLowerCase();
     $('aptA').setAttribute('aria-pressed', a === 'A'); $('aptB').setAttribute('aria-pressed', a === 'B');
     $('legendTitle').textContent = 'Appartamento ' + a;
-    if (board.scrollWidth > board.clientWidth) board.scrollTo({left: a === 'A' ? 0 : board.scrollWidth, behavior: reduce ? 'auto' : 'smooth'});
     [].forEach.call(legend.querySelectorAll('.legend__note'), function(n){
       n.textContent = a === 'A' ? 'L\'appartamento B ha la stessa disposizione, specchiata.' : 'Disposizione specchiata dell\'appartamento A: stessi ambienti e stesse finiture.';
     });
@@ -783,6 +784,11 @@ footer .wrap{padding-block:90px 36px}
   });
 
   /* ---------- Ambienti: stampe ---------- */
+  /* foto del garage, anche nella galleria */
+  [['tretro','retro','Garage dal portone'],['tportone','portone','Garage verso l\'uscita'],['tcolonnina','colonnina','Colonnina di ricarica'],['tfianco','fianco','Garage di fianco'],['tsoffitto','soffitto','Soffitto del garage']].forEach(function(g){
+    IMG[g[0]] = {src:'img/tour-' + g[1] + '.webp', view:g[2], alt:'Render del garage in legno con ricarica per auto elettrica: ' + g[2].toLowerCase()};
+  });
+  var GT = ['tretro','tportone','tcolonnina','tfianco','tsoffitto'];
   /* righe della stessa altezza: ogni foto è larga in proporzione al suo formato */
   var PRINTS = [
     [['giorno',1.333,'Pranzo e ingresso','Zona giorno',['giorno','soggiorno','cucina']],
@@ -793,7 +799,12 @@ footer .wrap{padding-block:90px 36px}
      ['b2f',.667,'Bagno 2','Verde salvia, travertino, ottone',['b2f','b2a']]],
     [['b1a',.667,'Bagno 1 dall\'alto','Doccia a filo pavimento',['b1a','b1f']],
      ['b2a',1.333,'Bagno 2 dall\'alto','Lavabo in appoggio e sanitari sospesi',['b2a','b2f']],
-     ['soggiorno',1.6,'Soggiorno','Portafinestra sul verde',['soggiorno','giorno','cucina']]]
+     ['soggiorno',1.6,'Soggiorno','Portafinestra sul verde',['soggiorno','giorno','cucina']]],
+    [['tretro',1.333,'Garage in legno','Auto in ricarica e capriata a vista',GT],
+     ['tportone',1.333,'Garage verso l\'uscita','Portone aperto sul giardino',GT],
+     ['tcolonnina',1.333,'Colonnina di ricarica','Wallbox a parete e luci LED',GT]],
+    [['tfianco',1.333,'Garage di fianco','Spazio libero attorno all\'auto',GT],
+     ['tsoffitto',1.333,'Soffitto del garage','Travi e perline in abete',GT]]
   ];
   var prints = $('prints');
   PRINTS.forEach(function(row){
